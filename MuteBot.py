@@ -3,7 +3,6 @@ from discord.utils import get
 
 mute = True
 client = discord.Client()
-discordToken = "" # blank token for github publish
 
 # mute or unmute user
 async def toggleMute(user, mute):
@@ -45,5 +44,10 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
+
+# get discord token
+f=open("token.txt","r")
+if f.mode == 'r':
+    discordToken = f.read()
     
 client.run(discordToken)    
