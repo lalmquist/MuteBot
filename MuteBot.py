@@ -1,52 +1,43 @@
-import requests
-import json
-import time
-from datetime import datetime
-import asyncio
-import aiohttp
-import os
 import discord
 from discord.utils import get
 
-toggle = False
+mute = True
 client = discord.Client()
-discordToken = ""
+discordToken = "" # blank token for github publish
 
-async def toggleMute(person, flag):
-    if flag == True:
-        await client.server_voice_state(person,mute=False)
-    else:
-        await client.server_voice_state(person,mute=True)
+# mute or unmute user
+async def toggleMute(user, mute):
+    await client.server_voice_state(user, mute=mute)
 
 @client.event
 async def on_message(message):
-    
-    server = client.get_server('764614850285535312')
+    global mute
 
+    # server specific
+    server = client.get_server('870407583721222144')
+
+    # only allow me to command bot :)
     if str(message.channel) != 'Direct Message with Logman':
-        print(message.channel)
-        print(message)
-        print('returning')
         return
 
+    # get message info
     userId = message.author.id
     user = server.get_member(userId)
     voicechannel = user.voice.voice_channel
 
-    global toggle
-
     channel = discord.utils.get(client.get_all_channels(), server__name=str(server), name=str(voicechannel))
 
+    # get members in voice channel
     member_ids = channel.voice_members
 
-    for x in member_ids:
-        await toggleMute(member_ids[0],toggle)     
+    for _, _ in enumerate(member_ids):
+        await toggleMute(member_ids[0], mute)     
     
-    if toggle == True:
-        toggle = False
+    # alternate between muting or unmuting
+    if mute == True:
+        mute = False
     else:
-        toggle = True
-
+        mute = True
 
 @client.event
 async def on_ready():
@@ -54,7 +45,5 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
-
-    #print(discord.version_info)
     
 client.run(discordToken)    
